@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mapView.onCreate(savedInstanceState);
 
+        mapView.getMapAsync(this);
+
     }
 
     @SuppressWarnings("MissingPermission")
@@ -96,10 +98,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    @SuppressWarnings("MissingPermission")
     @Override
     protected void onStart() {
         super.onStart();
         mapView.onStart();
+        if (locationEngine != null){
+            locationEngine.requestLocationUpdates();
+        }
+
+        if (locationLayerPlugin != null){
+            locationLayerPlugin.onStart();
+        }
     }
 
     @Override
@@ -111,6 +121,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onStop() {
         super.onStop();
+        if (locationEngine != null){
+            locationEngine.removeLocationUpdates();
+        }
+        if (locationLayerPlugin != null){
+            locationLayerPlugin.onStop();
+        }
+
         mapView.onStop();
     }
 
@@ -130,6 +147,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
+        if (locationEngine != null){
+            locationEngine.deactivate();
+        }
     }
 
     @Override
