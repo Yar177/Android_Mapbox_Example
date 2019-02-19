@@ -5,12 +5,17 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.mapbox.android.core.location.*;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -23,13 +28,18 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineListener, PermissionsListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineListener, PermissionsListener, MapboxMap.OnMapClickListener {
     private MapView mapView;
     private MapboxMap map;
     private PermissionsManager permissionsManager;
     private LocationEngine locationEngine;
     private LocationLayerPlugin locationLayerPlugin;
     private Location originLocation;
+    private Point originPosition;
+    private Point destinationPosition;
+    private Marker destMarker;
+
+    private Button startButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +49,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+
+        startButton = (Button) findViewById(R.id.startButton);
+
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //lunch navigation UI
+            }
+        });
 
     }
 
@@ -74,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
         map = mapboxMap;
+        map.addOnMapClickListener(this);
         enableLocation();
 
     }
@@ -180,4 +200,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    @Override
+    public void onMapClick(@NonNull LatLng point) {
+        if (destMarker != null){
+            map.removeMarker(destMarker);
+        }
+
+        destMarker = map.addMarker(new MarkerOptions().position(point));
+
+        destinationPosition = Point.fromLngLat(point.getLongitude(), point.getLatitude());
+        originPosition = Point.fromLngLat(originLocation.getLongitude(), originLocation.getLatitude());
+
+        startButton.setEnabled(true);
+        startButton.setBackgroundResource(R.color.mapbox_blue);
+
+
+
+    }
 }
