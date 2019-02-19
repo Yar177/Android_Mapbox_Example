@@ -11,11 +11,15 @@ import com.mapbox.android.core.location.*;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
+import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
+import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
 
 import java.util.List;
 
@@ -45,15 +49,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
         locationEngine.activate();
         Location lastLocation = locationEngine.getLastLocation();
+
         if (lastLocation != null){
             originLocation = lastLocation;
+            setCameraPosition(lastLocation);
+        }else {
+            locationEngine.addLocationEngineListener(this);
         }
+    }
 
+    @SuppressWarnings("MissingPermission")
+    private void initLocationLayer(){
+        locationLayerPlugin = new LocationLayerPlugin(mapView, map, locationEngine);
+        locationLayerPlugin.setLocationLayerEnabled(true);
+        locationLayerPlugin.setCameraMode(CameraMode.TRACKING);
+        locationLayerPlugin.setRenderMode(RenderMode.NORMAL);
 
     }
 
-    private void initLocationLayer(){
-
+    private void setCameraPosition(Location location){
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()),
+               13.0 ));
     }
 
     @Override
@@ -117,12 +133,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
+    @SuppressWarnings("MissingPermission")
     public void onConnected() {
+        locationEngine.requestLocationUpdates();
 
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        if (location != null){
+            originLocation = location;
+            setCameraPosition(location);
+        }
 
     }
 
