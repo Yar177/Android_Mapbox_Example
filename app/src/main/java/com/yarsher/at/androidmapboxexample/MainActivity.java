@@ -36,11 +36,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         Mapbox.getInstance(this, "pk.eyJ1IjoieWFyc2hlciIsImEiOiJjanNidmR4bHgwZTFsNDlqeHU1Znpqbmw2In0.wPWBVb2YUg4MJywiqUMAIQ");
         setContentView(R.layout.activity_main);
-
         mapView = (MapView) findViewById(R.id.mapView);
-
         mapView.onCreate(savedInstanceState);
-
         mapView.getMapAsync(this);
 
     }
