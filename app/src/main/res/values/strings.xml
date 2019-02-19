@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AndroidMapboxExample</string>
+    <string name="access_token">pk.eyJ1IjoieWFyc2hlciIsImEiOiJjanNidmR4bHgwZTFsNDlqeHU1Znpqbmw2In0.wPWBVb2YUg4MJywiqUMAIQ</string>
+
+</resources>
